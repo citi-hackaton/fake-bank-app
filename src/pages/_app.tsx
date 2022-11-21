@@ -1,19 +1,22 @@
 import * as React from "react";
 import Head from "next/head";
-import { AppProps } from "next/app";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import theme from "@/utils/materialUiTheme";
 import createEmotionCache from "@/utils/createEmotionCache";
+import type { AppProps } from "next/app";
+import { SessionProvider } from "next-auth/react";
+import { Session } from "next-auth";
 
 const clientSideEmotionCache = createEmotionCache();
 
-interface MyAppProps extends AppProps {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MyAppProps<T = any> = AppProps<T> & {
   emotionCache?: EmotionCache;
-}
+};
 
-export default function MyApp(props: MyAppProps) {
+export default function MyApp(props: MyAppProps<{ session: Session }>) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   return (
     <CacheProvider value={emotionCache}>
@@ -22,7 +25,9 @@ export default function MyApp(props: MyAppProps) {
       </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Component {...pageProps} />
+        <SessionProvider session={pageProps.session}>
+          <Component {...pageProps} />
+        </SessionProvider>
       </ThemeProvider>
     </CacheProvider>
   );
