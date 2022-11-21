@@ -5,7 +5,7 @@
       "@/components/*": ["components/*"],
       "@/containers/*": ["containers/*"],
       "@/styles/*": ["styles/*"],
-      "@/pages/*": ["pages/*"],
+      "@/pages/*": ["src/pages/*"],
       "@/types/*": ["types/*"],
       "@/redux/*": ["redux/*"],
       "@/hooks/*": ["hooks/*"],
