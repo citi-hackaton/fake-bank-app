@@ -8,6 +8,7 @@
       "@/pages/*": ["src/pages/*"],
       "@/types/*": ["types/*"],
       "@/redux/*": ["redux/*"],
+      "@/lib/*": ["lib/*"],
       "@/hooks/*": ["hooks/*"],
       "@/services/*": ["services/*"],
       "@/utils/*": ["utils/*"]

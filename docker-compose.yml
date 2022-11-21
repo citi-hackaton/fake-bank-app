@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  postgres:
+    restart: always
+    image: "postgres"
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+      PGPORT: ${PG_PORT}
+    ports:
+      - ${PG_PORT}:${PG_PORT}
+    volumes:
+      - ./dbVolume:/var/lib/postgresql/data 

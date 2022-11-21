@@ -18,7 +18,7 @@ import styled from "@emotion/styled";
 
 const drawerWidth = 240;
 
-const DrawerAppBar = () => {
+const MainNavbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
@@ -46,7 +46,7 @@ const DrawerAppBar = () => {
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <StyledContainer>
       <AppBar component="nav">
         <Toolbar>
           <IconButton
@@ -74,13 +74,13 @@ const DrawerAppBar = () => {
           </Box>
         </Toolbar>
       </AppBar>
-      <Box component="nav">
+      <StyledBox component="nav">
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },
@@ -88,13 +88,21 @@ const DrawerAppBar = () => {
           }}>
           {drawer}
         </Drawer>
-      </Box>
-    </Box>
+      </StyledBox>
+    </StyledContainer>
   );
 };
+
+const StyledContainer = styled("div")`
+  height: 64px;
+`;
 
 const StyledLink = styled(Link)`
   text-decoration: none;
 `;
 
-export default DrawerAppBar;
+const StyledBox = styled(Box)`
+  height: 100%;
+`;
+
+export default MainNavbar;
