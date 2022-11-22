@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
 
-const AuthForm = ({ onClick }: AuthFormProps) => {
+const AuthForm = ({ onClick, text }: AuthFormProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,7 +23,7 @@ const AuthForm = ({ onClick }: AuthFormProps) => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <Button variant="contained" onClick={() => onClick(username, password)}>
-        Register
+        {text}
       </Button>
     </StyledContainer>
   );
@@ -37,6 +37,7 @@ const StyledContainer = styled("div")`
 
 interface AuthFormProps {
   onClick: (username: string, password: string) => void;
+  text: string;
 }
 
 export default AuthForm;

@@ -16,14 +16,19 @@ const hashPassword = async (password: string) => {
 };
 
 async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
-  const db = DatabaseInstance.getInstance().getConnection();
-  const { name, password } = req.body || {};
-  if (!name || !password) {
-    return res.status(400).json({ message: "Username and password are required." });
+  try {
+    const db = DatabaseInstance.getInstance().getConnection();
+    const { username, password } = req.body || {};
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required." });
+    }
+    const hashedPassword = await hashPassword(password);
+    const user = await db.user.create({
+      data: { name: username, password: hashedPassword },
+    });
+    const { password: _, ...userWithoutPassword } = user;
+    return res.status(201).json(userWithoutPassword);
+  } catch (errror) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-  const hashedPassword = await hashPassword(password);
-  const user = await db.user.create({
-    data: { name: req.body.name, password: hashedPassword },
-  });
-  return res.status(201).json(user);
 }
