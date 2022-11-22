@@ -5,15 +5,24 @@ import React from "react";
 import IntroductionSection from "./IntroductionSection";
 import UserBankAccount from "./UserBankAccount";
 
-const Home = () => {
+const MainContainer = () => {
   const { data: user } = useSession();
+  return (
+    <>
+      <Typography variant="h4" fontWeight={700}>
+        {user ? "Your bank account details" : "Welcome to the bank"}
+      </Typography>
+      {user ? <UserBankAccount /> : <IntroductionSection />}
+    </>
+  );
+};
+
+const Home = () => {
+  const { status } = useSession();
   return (
     <StyledContainer>
       <StyledWrapper>
-        <Typography variant="h4" fontWeight={700}>
-          {user ? "Your bank account details" : "Welcome to the bank"}
-        </Typography>
-        {user ? <UserBankAccount /> : <IntroductionSection />}
+        {status === "loading" ? <Typography>Loading...</Typography> : <MainContainer />}
       </StyledWrapper>
     </StyledContainer>
   );

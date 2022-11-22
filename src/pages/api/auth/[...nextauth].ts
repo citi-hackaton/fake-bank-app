@@ -49,6 +49,12 @@ const options: NextAuthOptions = {
     signIn: "/login",
     signOut: "/logout",
   },
+  callbacks: {
+    jwt: async ({ token, user }) => {
+      user && (token.user = user);
+      return token;
+    },
+  },
 };
 
 const authHandler = (req: NextApiRequest, res: NextApiResponse) => NextAuth(req, res, options);
