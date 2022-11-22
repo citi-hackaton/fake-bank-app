@@ -13,7 +13,7 @@ const LoginSection = () => {
   return (
     <StyledContainer>
       <h1>Log in</h1>
-      <AuthForm onClick={handleLogin} />
+      <AuthForm onClick={handleLogin} text="Log in" />
     </StyledContainer>
   );
 };

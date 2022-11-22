@@ -15,10 +15,12 @@ import { useState } from "react";
 import routes from "./routes";
 import Link from "next/link";
 import styled from "@emotion/styled";
+import { useSession } from "next-auth/react";
 
 const drawerWidth = 240;
 
 const MainNavbar = () => {
+  const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
@@ -32,15 +34,22 @@ const MainNavbar = () => {
       </Typography>
       <Divider />
       <List>
-        {routes.map((route) => (
-          <StyledLink key={route.name} href={route.path}>
-            <ListItem key={route.name} disablePadding>
-              <ListItemButton sx={{ textAlign: "center" }}>
-                <ListItemText primary={route.name} />
-              </ListItemButton>
-            </ListItem>
-          </StyledLink>
-        ))}
+        {routes.map((route) => {
+          if (
+            (session?.user && route.visibleWhenLoggedIn) ||
+            (!session?.user && route.visibleWhenLoggedOut)
+          ) {
+            return (
+              <StyledLink key={route.name} href={route.path}>
+                <ListItem key={route.name} disablePadding>
+                  <ListItemButton sx={{ textAlign: "center" }}>
+                    <ListItemText primary={route.name} />
+                  </ListItemButton>
+                </ListItem>
+              </StyledLink>
+            );
+          }
+        })}
       </List>
     </Box>
   );
@@ -64,13 +73,20 @@ const MainNavbar = () => {
             Citi Bank
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            {routes.map((route) => (
-              <StyledLink key={route.name} href={route.path}>
-                <Button key={route.name} sx={{ color: "#fff" }}>
-                  {route.name}
-                </Button>
-              </StyledLink>
-            ))}
+            {routes.map((route) => {
+              if (
+                (session?.user && route.visibleWhenLoggedIn) ||
+                (!session?.user && route.visibleWhenLoggedOut)
+              ) {
+                return (
+                  <StyledLink key={route.name} href={route.path}>
+                    <Button key={route.name} sx={{ color: "#fff" }}>
+                      {route.name}
+                    </Button>
+                  </StyledLink>
+                );
+              }
+            })}
           </Box>
         </Toolbar>
       </AppBar>

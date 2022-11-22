@@ -12,7 +12,7 @@ const RegisterSection = () => {
   return (
     <StyledContainer>
       <h1>Register account</h1>
-      <AuthForm onClick={handleRegister} />
+      <AuthForm onClick={handleRegister} text="Register" />
     </StyledContainer>
   );
 };

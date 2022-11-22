@@ -45,6 +45,10 @@ const options: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  pages: {
+    signIn: "/login",
+    signOut: "/logout",
+  },
 };
 
 const authHandler = (req: NextApiRequest, res: NextApiResponse) => NextAuth(req, res, options);
