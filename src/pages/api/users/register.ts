@@ -18,13 +18,13 @@ const hashPassword = async (password: string) => {
 async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
   try {
     const db = DatabaseInstance.getInstance().getConnection();
-    const { name, password } = req.body || {};
-    if (!name || !password) {
+    const { username, password } = req.body || {};
+    if (!username || !password) {
       return res.status(400).json({ message: "Username and password are required." });
     }
     const hashedPassword = await hashPassword(password);
     const user = await db.user.create({
-      data: { name: req.body.name, password: hashedPassword },
+      data: { name: username, password: hashedPassword },
     });
     const { password: _, ...userWithoutPassword } = user;
     return res.status(201).json(userWithoutPassword);
