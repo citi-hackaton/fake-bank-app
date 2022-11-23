@@ -20,6 +20,10 @@ const StyledWrapper = styled("div")`
   margin-top: 20px;
   display: grid;
   grid-template-columns: 2fr 3fr;
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 export default UserBankAccount;
