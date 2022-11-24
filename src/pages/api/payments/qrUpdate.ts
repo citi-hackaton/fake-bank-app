@@ -69,29 +69,17 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    // const { data } = await axios.post<QRPPTransactionData>(
-    //   `${process.env.QRPP_ENDPOINT_URL}/validateTransaction`,
-    //   {
-    //     transactionId,
-    //   },
-    //   {
-    //     headers: {
-    //       Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
-    //     },
-    //   }
-    // );
-
-    const data: QRPPTransactionData = {
-      transactionData: {
-        amount: 100,
-        description: "test",
-        clientId: 124124124124,
-        clientName: "John Doe",
-        bankAccount: "123456789",
-        address: "1234 Main St",
-        status: QRPPStatus.PENDING,
+    const { data } = await axios.post<QRPPTransactionData>(
+      `${process.env.QRPP_ENDPOINT_URL}/validateTransaction`,
+      {
+        transactionId,
       },
-    };
+      {
+        headers: {
+          Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
+        },
+      }
+    );
 
     if (data.transactionData.status !== QRPPStatus.PENDING) {
       return res.status(400).json({ message: "Wrong transaction status" });
@@ -103,18 +91,18 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    // await axios.post(
-    //   `${process.env.QRPP_ENDPOINT_URL}/updateTransactionStatus`,
-    //   {
-    //     transactionId,
-    //     action: newStatus === QRPPStatus.ACCEPTED ? "CONFIRM" : "REJECT",
-    //   },
-    //   {
-    //     headers: {
-    //       Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
-    //     },
-    //   }
-    // );
+    await axios.post(
+      `${process.env.QRPP_ENDPOINT_URL}/updateTransactionStatus`,
+      {
+        transactionId,
+        action: newStatus === QRPPStatus.ACCEPTED ? "CONFIRM" : "REJECT",
+      },
+      {
+        headers: {
+          Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
+        },
+      }
+    );
 
     return res.status(200).json({ message: "OK" });
   } catch (errror) {

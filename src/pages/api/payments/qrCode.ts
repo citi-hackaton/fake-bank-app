@@ -7,6 +7,7 @@ import InternalTransactionStatus from "@/types/InternalTransactionStatus";
 import DatabaseInstance from "@/lib/DatabaseInstance";
 import { TransactionStatus } from "@prisma/client";
 import InternalInitializationRequestResponse from "@/types/InternalInitializationRequestResponse";
+import axios from "axios";
 
 async function initializePayment(
   transactionId: string,
@@ -103,29 +104,17 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    // const { data } = await axios.post<QRPPTransactionData>(
-    //   `${process.env.QRPP_ENDPOINT_URL}/validateTransaction`,
-    //   {
-    //     transactionId,
-    //   },
-    //   {
-    //     headers: {
-    //       Authorization: `X-QRPP-Api-Key ${token.accessToken}`,
-    //     },
-    //   }
-    // );
-
-    const data: QRPPTransactionData = {
-      transactionData: {
-        amount: 100,
-        description: "test",
-        clientId: 124124124124,
-        clientName: "John Doe",
-        bankAccount: "123456789",
-        address: "1234 Main St",
-        status: QRPPStatus.PENDING,
+    const { data } = await axios.post<QRPPTransactionData>(
+      `${process.env.QRPP_ENDPOINT_URL}/validateTransaction`,
+      {
+        transactionId,
       },
-    };
+      {
+        headers: {
+          Authorization: `X-QRPP-Api-Key ${token.accessToken}`,
+        },
+      }
+    );
 
     if (data.transactionData.status === QRPPStatus.PENDING) {
       const paymentInitialization = await initializePayment(transactionId, data, token);
