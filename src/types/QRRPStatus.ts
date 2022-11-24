@@ -1,0 +1,9 @@
+enum QRPPStatus {
+  INITIAL = "INITIAL",
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+  TIMED_OUT = "TIMED_OUT",
+}
+
+export default QRPPStatus;

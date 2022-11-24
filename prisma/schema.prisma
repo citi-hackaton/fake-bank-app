@@ -43,35 +43,29 @@ model VerificationToken {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  name          String        @unique
-  email         String?       @unique
-  password      String?
-  image         String?
-  balance       Float         @default(100000)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  transaction   Transaction[]
-}
-
-model TransactionType {
   id          String        @id @default(cuid())
-  name        String
+  name        String        @unique
+  email       String?       @unique
+  password    String?
+  image       String?
+  balance     Float         @default(100000)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  accounts    Account[]
+  sessions    Session[]
   transaction Transaction[]
 }
 
 model Transaction {
-  id              String          @id @default(cuid())
+  id              String   @id @default(cuid())
   userId          String
-  transactionId   String
   type            String
   amount          Float
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  user            User            @relation(fields: [userId], references: [id])
-  transactionType TransactionType @relation(fields: [type], references: [id])
+  description     String?
+  receiverName    String?
+  receiverAccount String?
+  receiverAddress String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id])
 }
