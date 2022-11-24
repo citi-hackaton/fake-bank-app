@@ -1,83 +1,102 @@
 import styled from "@emotion/styled";
 import { Modal, Typography } from "@mui/material";
 import axios from "axios";
-import React, { Dispatch, SetStateAction, useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { QrReader } from "react-qr-reader";
-import QRPPTransactionData from "@/types/QRPPTransactionData";
+import InternalInitializationRequestResponse from "@/types/InternalInitializationRequestResponse";
+import ConfirmTransfer from "./ConfirmTransfer";
 
 interface TransactionBody {
   transactionId: string;
 }
 
-const QRScannerModal = ({
-  isModalOpened,
-  setIsModalOpened,
-  setIsScanError,
-  isScanError,
-}: QRScannerModalProps) => {
-  const [result, setResult] = useState<string | null>(null);
-  const alreadyScanned = useRef<boolean>(false);
+const QRScannerModal = React.memo(({ isModalOpened, setIsModalOpened }: QRScannerModalProps) => {
+  const [isScanError, setIsScanError] = useState<string | null>(null);
+  const [qrResult, setQrResult] = useState<InternalInitializationRequestResponse | null>(null);
+  const [alreadyScanned, setAlreadyScanned] = useState(false);
+
+  const handleModalClose = () => {
+    setIsModalOpened(false);
+    setQrResult(null);
+    setAlreadyScanned(false);
+    setIsScanError(null);
+  };
 
   const handleParseQrResult = (data: string) => {
     try {
       const parsedData: TransactionBody = JSON.parse(data);
+      if (alreadyScanned) {
+        return;
+      }
       if (!parsedData?.transactionId) {
         throw new Error("Invalid QR code");
       }
-      if (alreadyScanned.current) {
-        return;
-      }
-      axios.post<QRPPTransactionData>("/api/transactions/validate", parsedData).then(() => {
-        setIsScanError(false);
-        setResult("Transaction completed successfully");
-        alreadyScanned.current = true;
-      });
-    } catch (error) {
-      setIsScanError(true);
-      alreadyScanned.current = false;
+      axios
+        .post<InternalInitializationRequestResponse>("/api/payments/qrCode", {
+          transactionId: parsedData.transactionId,
+        })
+        .then(({ data }) => {
+          setIsScanError(null);
+          setQrResult(data);
+          setAlreadyScanned(true);
+        });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setIsScanError("Invalid QR code");
+      setAlreadyScanned(false);
     }
   };
 
   return (
-    <Modal open={isModalOpened} onClose={() => setIsModalOpened(false)}>
+    <Modal open={isModalOpened} onClose={handleModalClose}>
       <StyledModalContainer>
         <StyledWrapper>
-          <Typography id="modal-modal-title" variant="h5">
-            Scan QR code
-          </Typography>
-          <StyledQrReader>
-            <QrReader
-              onResult={(result) => {
-                if (!!result) {
-                  handleParseQrResult(result.getText());
-                }
-              }}
-              constraints={{ facingMode: "environment" }}
-            />
-          </StyledQrReader>
-          {isScanError && (
-            <Typography color="error" variant="h5">
-              Invalid QR code
-            </Typography>
+          {qrResult ? (
+            <ConfirmTransfer qrResult={qrResult} />
+          ) : (
+            <>
+              <Typography id="modal-modal-title" variant="h5">
+                Scan QR code
+              </Typography>
+              <StyledQrReader>
+                <QrReader
+                  onResult={(result) => {
+                    if (!!result) {
+                      handleParseQrResult(result.getText());
+                    }
+                  }}
+                  constraints={{ facingMode: "environment" }}
+                />
+              </StyledQrReader>
+              {isScanError && (
+                <Typography color="error" variant="h5">
+                  Invalid QR code
+                </Typography>
+              )}
+            </>
           )}
-          {result && <Typography variant="h6">Result: {result}</Typography>}
         </StyledWrapper>
       </StyledModalContainer>
     </Modal>
   );
-};
+});
+
+QRScannerModal.displayName = "QRScannerModal";
 
 const StyledModalContainer = styled("div")`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 75vw;
+  width: 60vw;
   background-color: #e7ebf0;
   border-radius: 5px;
   boxshadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px,
     rgb(0 0 0 / 12%) 0px 1px 3px 0px;
   padding: 16px;
+  @media (max-width: 800px) {
+    width: 90vw;
+  }
 `;
 
 const StyledWrapper = styled("div")`
@@ -95,9 +114,7 @@ const StyledQrReader = styled("div")`
 
 interface QRScannerModalProps {
   isModalOpened: boolean;
-  isScanError: boolean;
   setIsModalOpened: Dispatch<SetStateAction<boolean>>;
-  setIsScanError: Dispatch<SetStateAction<boolean>>;
 }
 
 export default QRScannerModal;

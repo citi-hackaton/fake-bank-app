@@ -1,15 +1,7 @@
-import QRPPStatus from "./QRRPStatus";
+import QRTransactionBody from "./QRTransactionBody";
 
 interface QRPPTransactionData {
-  transactionData: {
-    amount: number;
-    description: string;
-    clientId: string;
-    clientName: string;
-    bankAccount: string;
-    address: string;
-    status: keyof typeof QRPPStatus;
-  };
+  transactionData: QRTransactionBody;
 }
 
 export default QRPPTransactionData;
