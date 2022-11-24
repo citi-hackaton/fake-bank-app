@@ -3,7 +3,7 @@ import { Modal, Typography } from "@mui/material";
 import axios from "axios";
 import React, { Dispatch, SetStateAction, useRef, useState } from "react";
 import { QrReader } from "react-qr-reader";
-import QRPPTransactionStatus from "@/types/QRPPTransactionStatus";
+import QRPPTransactionData from "@/types/QRPPTransactionData";
 
 interface TransactionBody {
   transactionId: string;
@@ -27,15 +27,11 @@ const QRScannerModal = ({
       if (alreadyScanned.current) {
         return;
       }
-      axios
-        .post<QRPPTransactionStatus>("/api/transactions/validate", parsedData)
-        .then(({ data }) => {
-          if (data.status === "correct") {
-            setIsScanError(false);
-            setResult("Transaction completed successfully");
-            alreadyScanned.current = true;
-          }
-        });
+      axios.post<QRPPTransactionData>("/api/transactions/validate", parsedData).then(() => {
+        setIsScanError(false);
+        setResult("Transaction completed successfully");
+        alreadyScanned.current = true;
+      });
     } catch (error) {
       setIsScanError(true);
       alreadyScanned.current = false;

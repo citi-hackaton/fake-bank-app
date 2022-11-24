@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import axios from "axios";
-
-interface TransactionValidateResponse {}
+import QRPPTransactionData from "@/types/QRPPTransactionData";
+import QRPPStatus from "@/types/QRRPStatus";
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -13,16 +13,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 }
 
 async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
-  const { transactionId } = req.body || {};
-  if (!transactionId) {
+  const { transactionId, bankUserId } = req.body || {};
+  if (!transactionId || !bankUserId) {
     return res.status(400).json({ message: "Bad Request" });
   }
   try {
     const token = await getToken({ req });
-    if (!token) {
+    if (!token || token.sub !== bankUserId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const { data } = await axios.post<TransactionValidateResponse>(
+    // In real life, you would need to check if user has access to this transaction
+    const { data } = await axios.post<QRPPTransactionData>(
       `${process.env.QRPP_ENDPOINT_URL}/validateTransaction`,
       {
         transactionId,
@@ -33,7 +34,11 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
         },
       }
     );
-    return res.status(200).json(data);
+
+    if (data.transactionData.status === QRPPStatus.INITIAL) {
+      return res.status(200).json(data);
+    }
+    return res.status(400).json({ message: "Problems with QR code" });
   } catch (errror) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
