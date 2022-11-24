@@ -135,6 +135,6 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
     }
     return res.status(400).json({ message: "Transaction is not pending" });
   } catch (errror) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error", extraCheck: errror });
   }
 }
