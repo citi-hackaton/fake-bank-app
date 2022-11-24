@@ -10,7 +10,6 @@ import QRScannerModal from "./QRScannerModal";
 
 const UserProfile = () => {
   const [isModalOpened, setIsModalOpened] = useState(false);
-  const [isScanError, setIsScanError] = useState(false);
 
   const { data: user } = useSession();
   const userData = useGetUserBankDetails();
@@ -23,12 +22,7 @@ const UserProfile = () => {
 
   return (
     <StyledWrapper>
-      <QRScannerModal
-        isModalOpened={isModalOpened}
-        setIsModalOpened={setIsModalOpened}
-        setIsScanError={setIsScanError}
-        isScanError={isScanError}
-      />
+      <QRScannerModal isModalOpened={isModalOpened} setIsModalOpened={setIsModalOpened} />
       <StyledTitle>
         <Typography variant="h5" fontWeight={700} color="text.secondary">
           User actions
@@ -123,6 +117,7 @@ const AccountBalance = styled("div")`
 const AccountActions = styled("div")`
   display: flex;
   justify-content: center;
+  margin-top: 30px;
 `;
 
 export default UserProfile;

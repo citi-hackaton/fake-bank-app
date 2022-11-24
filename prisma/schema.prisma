@@ -7,6 +7,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum TransactionStatus {
+  Initial
+  Pending
+  Success
+  Rejected
+  TimedOut
+}
+
 model Account {
   id                 String    @id @default(cuid())
   userId             String
@@ -60,11 +68,13 @@ model Transaction {
   id              String   @id @default(cuid())
   userId          String
   type            String
+  QRtransactionId String?  @unique
   amount          Float
   description     String?
   receiverName    String?
   receiverAccount String?
   receiverAddress String?
+  status          TransactionStatus
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   user            User     @relation(fields: [userId], references: [id])

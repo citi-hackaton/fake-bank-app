@@ -10,7 +10,7 @@ import TableRow from "@mui/material/TableRow";
 import { useState } from "react";
 
 interface Column {
-  id: "id" | "amount" | "type" | "createdAt";
+  id: "id" | "amount" | "status" | "QRtransactionId" | "type" | "createdAt";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -19,7 +19,9 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "id", label: "Id", minWidth: 100 },
+  { id: "QRtransactionId", label: "QR Id", minWidth: 100 },
   { id: "amount", label: "Amount", minWidth: 170 },
+  { id: "status", label: "Status", minWidth: 170 },
   {
     id: "type",
     label: "Type",
@@ -75,7 +77,7 @@ const TransactionHistory = () => {
                     const value = row[column.id];
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {value.toString()}
+                        {value && value.toString()}
                       </TableCell>
                     );
                   })}
