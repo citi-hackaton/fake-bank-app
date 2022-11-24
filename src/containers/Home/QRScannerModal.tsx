@@ -14,6 +14,7 @@ const QRScannerModal = React.memo(({ isModalOpened, setIsModalOpened }: QRScanne
   const [isScanError, setIsScanError] = useState<string | null>(null);
   const [qrResult, setQrResult] = useState<InternalInitializationRequestResponse | null>(null);
   const [alreadyScanned, setAlreadyScanned] = useState(false);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
 
   const handleModalClose = () => {
     setIsModalOpened(false);
@@ -39,10 +40,19 @@ const QRScannerModal = React.memo(({ isModalOpened, setIsModalOpened }: QRScanne
           setIsScanError(null);
           setQrResult(data);
           setAlreadyScanned(true);
+          setTransactionId(parsedData.transactionId);
+        })
+        .catch(() => {
+          setIsScanError("Invalid QR code");
+          setQrResult(null);
+          setTransactionId(null);
+          setAlreadyScanned(false);
         });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setIsScanError("Invalid QR code");
+      setQrResult(null);
+      setTransactionId(null);
       setAlreadyScanned(false);
     }
   };
@@ -51,8 +61,14 @@ const QRScannerModal = React.memo(({ isModalOpened, setIsModalOpened }: QRScanne
     <Modal open={isModalOpened} onClose={handleModalClose}>
       <StyledModalContainer>
         <StyledWrapper>
-          {qrResult ? (
-            <ConfirmTransfer qrResult={qrResult} />
+          {qrResult && transactionId ? (
+            <ConfirmTransfer
+              qrResult={qrResult}
+              transactionId={transactionId}
+              setIsModalOpened={setIsModalOpened}
+              setQrResult={() => setQrResult(null)}
+              setAlreadyScanned={() => setAlreadyScanned(false)}
+            />
           ) : (
             <>
               <Typography id="modal-modal-title" variant="h5">

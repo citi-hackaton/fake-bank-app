@@ -17,12 +17,6 @@ const routes: Route[] = [
     visibleWhenLoggedIn: true,
     visibleWhenLoggedOut: false,
   },
-  {
-    path: "/register",
-    name: "Register",
-    visibleWhenLoggedIn: false,
-    visibleWhenLoggedOut: true,
-  },
 ];
 
 type Route = {
