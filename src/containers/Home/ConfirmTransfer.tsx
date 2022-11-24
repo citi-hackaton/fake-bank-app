@@ -22,9 +22,14 @@ const ConfirmTransfer = ({ qrResult }: ConfirmTransferProps) => {
           disabled={true}
         />
         <TextField label="Payment amount" variant="filled" value={amount} disabled={true} />
-        <Button variant="contained" color="primary">
-          Confirm QR Transfer
-        </Button>
+        <StyledActions>
+          <Button variant="contained" color="secondary">
+            Cancel QR Transfer
+          </Button>
+          <Button variant="contained" color="primary">
+            Confirm QR Transfer
+          </Button>
+        </StyledActions>
       </StyledWireInformation>
     </StyledContainer>
   );
@@ -42,6 +47,12 @@ const StyledWireInformation = styled("div")`
   flex-direction: column;
   align-items: center;
   gap: 15px;
+`;
+
+const StyledActions = styled("div")`
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
 `;
 
 interface ConfirmTransferProps {
