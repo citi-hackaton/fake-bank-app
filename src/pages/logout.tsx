@@ -11,7 +11,7 @@ interface LogoutPageProps {
 }
 
 export const getStaticProps = async (_ctx: GetStaticProps) => ({
-  props: { callbackUrl: process.env.NEXTAUTH_URL },
+  props: { callbackUrl: "/" },
 });
 
 export default LogoutPage;
