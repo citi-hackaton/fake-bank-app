@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
-import QRPPTransactionData from "@/types/QRPPTransactionData";
 import QRPPStatus from "@/types/QRRPStatus";
 import DatabaseInstance from "@/lib/DatabaseInstance";
 import InternalTransactionStatus from "@/types/InternalTransactionStatus";
@@ -11,6 +10,7 @@ interface InternalStatusChange {
 }
 
 async function updatePaymentInternal(
+  token: string,
   transactionId: string,
   newStatus: QRPPStatus
 ): Promise<InternalStatusChange> {
@@ -27,6 +27,29 @@ async function updatePaymentInternal(
         status: InternalTransactionStatus.FAILURE,
       };
     }
+    const foundUser = await db.user.findUnique({
+      where: {
+        id: token,
+      },
+      select: {
+        balance: true,
+      },
+    });
+
+    if (!foundUser) {
+      return {
+        status: InternalTransactionStatus.FAILURE,
+      };
+    }
+
+    await db.user.update({
+      where: {
+        id: token,
+      },
+      data: {
+        balance: foundUser.balance - foundTransaction.amount,
+      },
+    });
 
     await db.transaction.update({
       where: {
@@ -69,23 +92,8 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const { data } = await axios.post<QRPPTransactionData>(
-      `${process.env.QRPP_ENDPOINT_URL}/qrPayments/validateTransaction`,
-      {
-        transactionId,
-      },
-      {
-        headers: {
-          Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
-        },
-      }
-    );
 
-    if (data.transactionData.status !== QRPPStatus.PENDING) {
-      return res.status(400).json({ message: "Wrong transaction status" });
-    }
-
-    const internalPayment = await updatePaymentInternal(transactionId, newStatus);
+    const internalPayment = await updatePaymentInternal(token.sub ?? "", transactionId, newStatus);
 
     if (internalPayment.status === InternalTransactionStatus.FAILURE) {
       return res.status(400).json({ message: "Bad request" });
@@ -95,7 +103,7 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
       `${process.env.QRPP_ENDPOINT_URL}/qrPayments/updateTransactionStatus`,
       {
         transactionId,
-        action: newStatus === QRPPStatus.ACCEPTED ? "CONFIRM" : "REJECT",
+        status: newStatus === QRPPStatus.ACCEPTED ? "ACCEPTED" : "REJECTED",
       },
       {
         headers: {
@@ -106,6 +114,7 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json({ message: "OK" });
   } catch (errror) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.log(errror);
+    return res.status(500).json({ message: "Internal Server Error", extra: errror });
   }
 }

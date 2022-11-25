@@ -10,7 +10,7 @@ interface TransactionBody {
   transactionId: string;
 }
 
-const QRScannerModal = React.memo(({ isModalOpened, setIsModalOpened }: QRScannerModalProps) => {
+const QRScannerModal = ({ isModalOpened, setIsModalOpened }: QRScannerModalProps) => {
   const [isScanError, setIsScanError] = useState<string | null>(null);
   const [qrResult, setQrResult] = useState<InternalInitializationRequestResponse | null>(null);
   const [alreadyScanned, setAlreadyScanned] = useState(false);
@@ -95,9 +95,7 @@ const QRScannerModal = React.memo(({ isModalOpened, setIsModalOpened }: QRScanne
       </StyledModalContainer>
     </Modal>
   );
-});
-
-QRScannerModal.displayName = "QRScannerModal";
+};
 
 const StyledModalContainer = styled("div")`
   position: absolute;

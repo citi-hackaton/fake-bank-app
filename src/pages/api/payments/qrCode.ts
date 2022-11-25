@@ -115,7 +115,6 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
         },
       }
     );
-
     if (data.transactionData.status === QRPPStatus.PENDING) {
       const paymentInitialization = await initializePayment(transactionId, data, token);
 
@@ -129,10 +128,37 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
         };
         return res.status(201).json(response);
       }
+
+      await axios.post(
+        `${process.env.QRPP_ENDPOINT_URL}/qrPayments/updateTransactionStatus`,
+        {
+          transactionId,
+          status: "REJECTED",
+        },
+        {
+          headers: {
+            Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
+          },
+        }
+      );
+
       return res
         .status(400)
         .json({ message: "Transaction rejected", detailedMessage: paymentInitialization.message });
     }
+
+    await axios.post(
+      `${process.env.QRPP_ENDPOINT_URL}/qrPayments/updateTransactionStatus`,
+      {
+        transactionId,
+        status: "REJECTED",
+      },
+      {
+        headers: {
+          Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
+        },
+      }
+    );
     return res.status(400).json({ message: "Transaction is not pending" });
   } catch (errror) {
     console.log(errror);
