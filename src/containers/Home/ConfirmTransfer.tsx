@@ -10,7 +10,6 @@ const ConfirmTransfer = ({
   transactionId,
   setIsModalOpened,
   setQrResult,
-  setAlreadyScanned,
 }: ConfirmTransferProps) => {
   const { amount, bankAccount, clientName, description } = qrResult.paymentDetails;
   const [progress, setProgress] = useState(120);
@@ -26,7 +25,6 @@ const ConfirmTransfer = ({
           setProgress(0);
           setIsModalOpened(false);
           setQrResult();
-          setAlreadyScanned();
         });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,7 +118,6 @@ interface ConfirmTransferProps {
   transactionId: string;
   setIsModalOpened: React.Dispatch<React.SetStateAction<boolean>>;
   setQrResult: () => void;
-  setAlreadyScanned: () => void;
 }
 
 export default ConfirmTransfer;

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { Modal, Typography } from "@mui/material";
 import axios from "axios";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useState, useRef } from "react";
 import { QrReader } from "react-qr-reader";
 import InternalInitializationRequestResponse from "@/types/InternalInitializationRequestResponse";
 import ConfirmTransfer from "./ConfirmTransfer";
@@ -13,25 +13,26 @@ interface TransactionBody {
 const QRScannerModal = ({ isModalOpened, setIsModalOpened }: QRScannerModalProps) => {
   const [isScanError, setIsScanError] = useState<string | null>(null);
   const [qrResult, setQrResult] = useState<InternalInitializationRequestResponse | null>(null);
-  const [alreadyScanned, setAlreadyScanned] = useState(false);
+  const alreadyScanned = useRef(false);
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
   const handleModalClose = () => {
     setIsModalOpened(false);
     setQrResult(null);
-    setAlreadyScanned(false);
+    alreadyScanned.current = false;
     setIsScanError(null);
   };
 
   const handleParseQrResult = (data: string) => {
     try {
       const parsedData: TransactionBody = JSON.parse(data);
-      if (alreadyScanned) {
+      if (alreadyScanned.current) {
         return;
       }
       if (!parsedData?.transactionId) {
         throw new Error("Invalid QR code");
       }
+      alreadyScanned.current = true;
       axios
         .post<InternalInitializationRequestResponse>("/api/payments/qrCode", {
           transactionId: parsedData.transactionId,
@@ -39,21 +40,21 @@ const QRScannerModal = ({ isModalOpened, setIsModalOpened }: QRScannerModalProps
         .then(({ data }) => {
           setIsScanError(null);
           setQrResult(data);
-          setAlreadyScanned(true);
+          alreadyScanned.current = true;
           setTransactionId(parsedData.transactionId);
         })
         .catch(() => {
           setIsScanError("Invalid QR code");
           setQrResult(null);
           setTransactionId(null);
-          setAlreadyScanned(false);
+          alreadyScanned.current = true;
         });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setIsScanError("Invalid QR code");
       setQrResult(null);
       setTransactionId(null);
-      setAlreadyScanned(false);
+      alreadyScanned.current = true;
     }
   };
 
@@ -67,7 +68,6 @@ const QRScannerModal = ({ isModalOpened, setIsModalOpened }: QRScannerModalProps
               transactionId={transactionId}
               setIsModalOpened={setIsModalOpened}
               setQrResult={() => setQrResult(null)}
-              setAlreadyScanned={() => setAlreadyScanned(false)}
             />
           ) : (
             <>
@@ -82,6 +82,7 @@ const QRScannerModal = ({ isModalOpened, setIsModalOpened }: QRScannerModalProps
                     }
                   }}
                   constraints={{ facingMode: "environment" }}
+                  scanDelay={1000}
                 />
               </StyledQrReader>
               {isScanError && (
