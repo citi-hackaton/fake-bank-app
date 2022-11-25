@@ -105,13 +105,13 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const { data } = await axios.post<QRPPTransactionData>(
-      `${process.env.QRPP_ENDPOINT_URL}/validateTransaction`,
+      `${process.env.QRPP_ENDPOINT_URL}/qrPayments/validateTransaction`,
       {
         transactionId,
       },
       {
         headers: {
-          Authorization: `X-QRPP-Api-Key ${token.accessToken}`,
+          Authorization: `X-QRPP-Api-Key ${process.env.QRPP_SECRET_KEY}`,
         },
       }
     );
@@ -135,6 +135,7 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
     }
     return res.status(400).json({ message: "Transaction is not pending" });
   } catch (errror) {
+    console.log(errror);
     return res.status(500).json({ message: "Internal Server Error", extraCheck: errror });
   }
 }

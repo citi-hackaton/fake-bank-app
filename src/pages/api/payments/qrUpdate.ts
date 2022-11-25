@@ -70,7 +70,7 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const { data } = await axios.post<QRPPTransactionData>(
-      `${process.env.QRPP_ENDPOINT_URL}/validateTransaction`,
+      `${process.env.QRPP_ENDPOINT_URL}/qrPayments/validateTransaction`,
       {
         transactionId,
       },
@@ -92,7 +92,7 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
     }
 
     await axios.post(
-      `${process.env.QRPP_ENDPOINT_URL}/updateTransactionStatus`,
+      `${process.env.QRPP_ENDPOINT_URL}/qrPayments/updateTransactionStatus`,
       {
         transactionId,
         action: newStatus === QRPPStatus.ACCEPTED ? "CONFIRM" : "REJECT",
