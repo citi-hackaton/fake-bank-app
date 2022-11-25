@@ -23,12 +23,16 @@ const options: NextAuthOptions = {
         }
 
         try {
-          const { data: user } = await axios.post("/api/users/check-credentials", credentials, {
-            headers: {
-              "Content-Type": "application/json; charset=utf-8",
-              accept: "application/json",
-            },
-          });
+          const { data: user } = await axios.post(
+            `${process.env.NEXTAUTH_URL}/api/users/check-credentials`,
+            credentials,
+            {
+              headers: {
+                "Content-Type": "application/json; charset=utf-8",
+                accept: "application/json",
+              },
+            }
+          );
           return user;
         } catch (_error) {
           return null;

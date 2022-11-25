@@ -29,6 +29,8 @@ async function handlePOST(req: NextApiRequest, res: NextApiResponse) {
 
   const isPasswordValid = await bcrypt.compare(req.body.password, user.password ?? "");
 
+  console.log("isPasswordValid", isPasswordValid);
+
   if (!isPasswordValid) {
     return res.status(401).json({ message: "Invalid password." });
   }
